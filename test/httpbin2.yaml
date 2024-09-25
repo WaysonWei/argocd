@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: httpbin2
+  name: httpbin2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin2
+  template:
+    metadata:
+      labels:
+        app: httpbin2
+    spec:
+      containers:
+      - image: docker.io/kennethreitz/httpbin
+        name: httpbin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: httpbin2
+  name: httpbin2
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: httpbin
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: httpbin2
+  labels:
+    app: httpbin2
+spec:
+  defaultBackend:
+    service:
+      name: httpbin2
+      port:
+        number: 80
